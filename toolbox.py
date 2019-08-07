@@ -6777,14 +6777,14 @@ class Functions:
             except:
                 tkMessageBox.showerror('Oops!', "Couldn't uninstall the product! Check your /package path and try again!")
 
-            try:
-                cmd_rm = [ADB, '-s', DEVICE_IN_USE, 'shell', 'rm', '-r', DEVICE_PRODUCT_PATHS[APP_SELECTED]]
-                cmd_mkdir = [ADB, '-s', DEVICE_IN_USE, 'shell', 'mkdir', DEVICE_PRODUCT_PATHS[APP_SELECTED]]
-                subprocess.run(cmd_rm)
-                subprocess.run(cmd_mkdir)
-            except Exception:
-                tkMessageBox.showinfo('Well...', "We couldn't delete some files! Why don't you check if everything was"
-                                                 " correctly removed?")
+            # try:
+            #     cmd_rm = [ADB, '-s', DEVICE_IN_USE, 'shell', 'rm', '-r', DEVICE_PRODUCT_PATHS[APP_SELECTED]]
+            #     cmd_mkdir = [ADB, '-s', DEVICE_IN_USE, 'shell', 'mkdir', DEVICE_PRODUCT_PATHS[APP_SELECTED]]
+            #     subprocess.run(cmd_rm)
+            #     subprocess.run(cmd_mkdir)
+            # except Exception:
+            #     tkMessageBox.showinfo('Well...', "We couldn't delete some files! Why don't you check if everything was"
+            #                                      " correctly removed?")
         else:
             tkMessageBox.showerror('Oops!', "Need select a product!")
     @staticmethod
