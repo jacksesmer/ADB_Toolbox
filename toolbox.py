@@ -6605,25 +6605,27 @@ class Functions:
     @staticmethod
     def transfer_file(files_input, path_radio, folder):
         file_name = files_input.get()
-        if file_name and folder:
-            if '/sdcard' not in folder:
-                folder = '/sdcard/' + folder
-            paths = {0: folder, 1: DEVICE_DOWNLOAD_PATH}
-            cmd = [ADB, '-s',  DEVICE_IN_USE, 'push', "{input_path}/{input_file}".format(input_path=INPUT_PATH,
-                                                                                         input_file=file_name), paths[path_radio.get()]]
-
-
-            folder_create = [ADB, '-s', DEVICE_IN_USE, 'shell', 'mkdir', folder]
-
-            try:
-                # subprocess.Popen(folder_create, startupinfo=subprocess.STARTUPINFO()).wait()
-                subprocess.Popen(folder_create).wait()
-                subprocess.check_call(cmd)
-                tkMessageBox.showinfo('Success!', 'Your file is now in the device!')
-            except:
-                tkMessageBox.showerror('Oops!', "Something went wrong! Why don't you try again?")
+        if path_radio.get() == 0:
+            if file_name and folder:
+                if '/sdcard' not in folder:
+                    folder = '/sdcard/' + folder
+            else:
+                tkMessageBox.showerror('Oops!', "Need select files or put a path name")
+                return
         else:
-            tkMessageBox.showerror('Oops!', "Need select files or put a path")
+            folder = '/sdcard/Download'
+        cmd = [ADB, '-s',  DEVICE_IN_USE, 'push', "{input_path}/{input_file}".format(input_path=INPUT_PATH,
+                                                                                     input_file=file_name), folder]
+
+        folder_create = [ADB, '-s', DEVICE_IN_USE, 'shell', 'mkdir', folder]
+
+        try:
+            # subprocess.Popen(folder_create, startupinfo=subprocess.STARTUPINFO()).wait()
+            subprocess.Popen(folder_create).wait()
+            subprocess.check_call(cmd)
+            tkMessageBox.showinfo('Success!', 'Your file is now in the device!')
+        except:
+            tkMessageBox.showerror('Oops!', "Something went wrong! Why don't you try again?")
 
     @staticmethod
     def install_version(versions):
@@ -7144,7 +7146,7 @@ class Functions:
                                                                                                              udid=DEVICE_IN_USE)
         if turn_on_off == 0:
             cmd = cmd.replace('true', 'false')
-        subprocess.call(cmd)
+        subprocess.call(cmd, shell=True)
 
         sleep(2)
         for _ in range(0, 60):
@@ -7287,7 +7289,7 @@ class Functions:
             elif function == 'clean_transfer_list':
                 Functions.clean_files_path(INPUT_PATH)
             elif function == 'clean_device_path':
-                Functions.clean_device_path()
+                Functions.clean_device_path(args[0], args[1])
             elif function == 'firebase_debug':
                 Functions.firebase_debug(args[0])
             elif function == 'wifi':
@@ -7632,8 +7634,16 @@ class Functions:
         return True
 
     @staticmethod
-    def clean_device_path():
-        cmd = [ADB, '-s',  DEVICE_IN_USE, 'shell', 'rm', '-r', DEVICE_PRODUCT_PATHS[APP_SELECTED]]
+    def clean_device_path(path, radio):
+        if radio == 0:
+            if path:
+                folder = '/sdcard/' + path
+            else:
+                tkMessageBox.showerror('Oops!', "Need folder name")
+                return
+        else:
+            folder = '/sdcard/Download'
+        cmd = [ADB, '-s',  DEVICE_IN_USE, 'shell', 'rm', '-r', folder]
         try:
             subprocess.check_call(cmd)
             tkMessageBox.showinfo('Success!', "Device's path is cleaned.")
@@ -7932,7 +7942,7 @@ class GUI:
         transfer_clean.grid(row=0, column=1, padx=2, pady=5)
 
         transfer_clean_device = Button(transfer_button_group, text='Clean Device',
-                             command=lambda: Functions.check_selected_device('clean_device_path', versions))
+                             command=lambda: Functions.check_selected_device('clean_device_path', path_tag.get(), folder_radio.get()))
         transfer_clean_device.grid(row=0, column=2, padx=2, pady=5)
         transfer_button_group.pack()
         transfer_button = Button(transfer_frame, text='Transfer To Device',
