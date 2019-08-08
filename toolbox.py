@@ -7032,7 +7032,7 @@ class Functions:
                     listbox.insert(END, package_item)
 
         def call_function(param):
-            pkg_name = str(listbox.get(listbox.curselection())).split('=')[1]
+            pkg_name = str(listbox.get(listbox.curselection())).split('=')[-1]
             if param == 'clear':
                 Functions.clear_cache(pkg_name)
             elif param == 'stop':
